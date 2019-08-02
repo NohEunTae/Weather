@@ -159,6 +159,13 @@ extension WeatherListViewController: UITableViewDelegate {
             }
         }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailPageViewController = WeatherDetailPageViewController(startIndex: indexPath.row, cities: conciseCites)
+        DispatchQueue.main.async {
+            self.navigationController?.pushViewController(detailPageViewController, animated: true)
+        }
+    }
 }
 
 extension WeatherListViewController: UITableViewDataSource {
