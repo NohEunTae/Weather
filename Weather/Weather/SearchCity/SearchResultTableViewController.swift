@@ -16,6 +16,8 @@ protocol SearchResultTableViewControllerDelegate: AnyObject {
 
 class SearchResultTableViewController: UITableViewController {
     var matchingItems: [MKMapItem] = []
+    private let mapView = MKMapView()
+    
     weak var delegate: SearchResultTableViewControllerDelegate? = nil
     
     init() {
@@ -39,7 +41,7 @@ class SearchResultTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SearchCityTableViewCell") as! SearchCityTableViewCell
-        cell.cityName.text = matchingItems[indexPath.row].placemark.administrativeArea!
+        cell.cityName.text = matchingItems[indexPath.row].placemark.title!
         return cell
     }
     
@@ -55,17 +57,19 @@ extension SearchResultTableViewController: UISearchResultsUpdating {
         guard let searchBarText = searchController.searchBar.text else { return }
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchBarText
-        let mapView = MKMapView()
-        request.region = mapView.region
         let search = MKLocalSearch(request: request)
-        search.start { [weak self] response, _ in
+        search.start { [unowned self] response, _ in
             guard let response = response else {
                 return
             }
-            self?.matchingItems = response.mapItems.filter { $0.placemark.administrativeArea != nil }
-            DispatchQueue.main.async { [weak self] in 
-                self?.tableView.reloadData()
-                mapView.removeAnnotations(mapView.annotations)
+            print(response.mapItems.count)
+            self.matchingItems = response.mapItems.filter {
+                $0.placemark.title != nil  && $0.placemark.title!.contains(searchBarText)
+            }
+            
+            DispatchQueue.main.async { [unowned self] in
+                self.tableView.reloadData()
+                self.mapView.removeAnnotations(self.mapView.annotations)
             }
         }
     }
