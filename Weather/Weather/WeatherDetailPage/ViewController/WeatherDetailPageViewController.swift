@@ -27,7 +27,7 @@ class WeatherDetailPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+        self.pageViewController = UIPageViewController(transitionStyle: .pageCurl, navigationOrientation: .horizontal, options: nil)
         self.pageViewController.dataSource = self
         
         guard let maybefirstViewController = self.viewController(at: startIndex) else {
@@ -36,7 +36,6 @@ class WeatherDetailPageViewController: UIViewController {
         
         let startingViewController: WeatherDetailViewController = maybefirstViewController
         let viewControllers = [startingViewController]
-        
         self.pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
         
         self.addChild(pageViewController)
@@ -52,7 +51,9 @@ class WeatherDetailPageViewController: UIViewController {
         if (self.cities.isEmpty || self.cities.count <= index) {
             return nil
         }
+        
         let dataViewController = WeatherDetailViewController(city: self.cities[index], index: index)
+        dataViewController.delegate = self
         return dataViewController
     }
 }
@@ -82,5 +83,25 @@ extension WeatherDetailPageViewController: UIPageViewControllerDataSource {
     
     func presentationCount(for pageViewController: UIPageViewController) -> Int {
         return self.cities.count
+    }
+}
+
+extension WeatherDetailPageViewController: WeatherDetailViewControllerDelegate {
+    func scrollDown() {
+        DispatchQueue.main.async {
+            self.navigationController?.setNavigationBarHidden(false, animated: true)
+        }
+    }
+    
+    func scrollUp() {
+        DispatchQueue.main.async {
+            self.navigationController?.setNavigationBarHidden(true, animated: true)
+        }
+    }
+    
+    func viewDidLoadCalled(_ index: Int) {
+        DispatchQueue.main.async {
+            self.title = self.cities[index].name
+        }
     }
 }
