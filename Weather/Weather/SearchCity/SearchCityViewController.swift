@@ -46,7 +46,7 @@ extension SearchCityViewController: UISearchControllerDelegate {
     func didDismissSearchController(_ searchController: UISearchController) {
         if isCancelButtonClicked {
             DispatchQueue.main.async { [unowned self] in
-                self.navigationController?.popViewController(animated: false)
+                self.navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -69,7 +69,7 @@ extension SearchCityViewController: UISearchBarDelegate {
 extension SearchCityViewController: SearchResultTableViewControllerDelegate {
     func searchDidFinished(item: MKMapItem) {
         DispatchQueue.main.async { [unowned self] in
-            self.navigationController?.popViewController(animated: false)
+            self.navigationController?.popViewController(animated: true)
             self.delegate?.searchDidFinished(item: item)
         }
     }
