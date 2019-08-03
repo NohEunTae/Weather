@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="center" reuseIdentifier="HourlyWeatherCollectionViewCell" id="gTV-IL-0wX" customClass="HourlyWeatherCollectionViewCell" customModule="Weather" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="99" height="99"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="99" height="99"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="오후 12시" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0y1-M2-qkD">
+                        <rect key="frame" x="0.0" y="0.0" width="99" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="qvI-2A-wyA"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="30%" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPS-dF-3Yb">
+                        <rect key="frame" x="0.0" y="20" width="99" height="12"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="12" id="Iw1-fk-9Q2"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                        <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="36°" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qsC-v5-rBK">
+                        <rect key="frame" x="0.0" y="78" width="99" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="Pqm-Oc-GAF"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="pqD-pL-2t4">
+                        <rect key="frame" x="34.5" y="34.5" width="30" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="Apr-FP-XFV"/>
+                            <constraint firstAttribute="width" constant="30" id="ng2-pp-dK3"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="aPS-dF-3Yb" secondAttribute="trailing" id="99J-rK-NHD"/>
+                <constraint firstAttribute="trailing" secondItem="qsC-v5-rBK" secondAttribute="trailing" id="GgY-7I-jRB"/>
+                <constraint firstItem="qsC-v5-rBK" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Gnb-dB-AjW"/>
+                <constraint firstAttribute="bottom" secondItem="qsC-v5-rBK" secondAttribute="bottom" id="JzO-c6-AH2"/>
+                <constraint firstItem="0y1-M2-qkD" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="QXw-sg-egJ"/>
+                <constraint firstItem="aPS-dF-3Yb" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="SOn-73-tHk"/>
+                <constraint firstAttribute="trailing" secondItem="0y1-M2-qkD" secondAttribute="trailing" id="UuH-o5-nZ4"/>
+                <constraint firstItem="0y1-M2-qkD" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="WE3-aJ-Dy0"/>
+                <constraint firstItem="aPS-dF-3Yb" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="20" id="k6S-kv-lq1"/>
+                <constraint firstItem="pqD-pL-2t4" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="rqD-vz-TGm"/>
+                <constraint firstItem="pqD-pL-2t4" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="upi-gb-ojW"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <connections>
+                <outlet property="precipProbability" destination="aPS-dF-3Yb" id="1Z1-B4-vBZ"/>
+                <outlet property="temp" destination="qsC-v5-rBK" id="EFT-tw-12D"/>
+                <outlet property="time" destination="0y1-M2-qkD" id="8SE-dB-bQK"/>
+                <outlet property="weatherIcon" destination="pqD-pL-2t4" id="41x-P0-EoT"/>
+            </connections>
+            <point key="canvasLocation" x="137.59999999999999" y="153.82308845577214"/>
+        </collectionViewCell>
+    </objects>
+</document>
