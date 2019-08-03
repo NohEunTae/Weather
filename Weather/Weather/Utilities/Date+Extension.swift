@@ -15,7 +15,7 @@ extension Date {
         dateFormatter.amSymbol = "오전"
         dateFormatter.pmSymbol = "오후"
         dateFormatter.timeZone = timezone
-        dateFormatter.locale = Locale.autoupdatingCurrent
+        dateFormatter.locale = Locale(identifier: "ko")
         return dateFormatter.string(from: self)
     }
 }
