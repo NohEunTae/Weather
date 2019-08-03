@@ -26,24 +26,29 @@ class WeatherDetailPageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.pageViewController = UIPageViewController(transitionStyle: .pageCurl, navigationOrientation: .horizontal, options: nil)
+        self.navigationController?.navigationBar.isHidden = true
+        self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         self.pageViewController.dataSource = self
-        
+
         guard let maybefirstViewController = self.viewController(at: startIndex) else {
             return
         }
         
         let startingViewController: WeatherDetailViewController = maybefirstViewController
-        let viewControllers = [startingViewController]
+        let startingNavigationController = UINavigationController(rootViewController: startingViewController)
+        let viewControllers = [startingNavigationController]
         self.pageViewController.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
-        
+    
         self.addChild(pageViewController)
         self.view.addSubview(pageViewController.view)
         
         let pageViewRect = self.view.bounds
         pageViewController.view.frame = pageViewRect
         pageViewController.didMove(toParent: self)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
     }
 
     // 특정 index에 해당하는 viewcontroller를 구한다
@@ -62,23 +67,25 @@ extension WeatherDetailPageViewController: UIPageViewControllerDataSource {
     
     // 이전 페이지에 대한 정보를 구한다.
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        let vc = viewController as? WeatherDetailViewController
+        let nv = viewController as? UINavigationController
+        let vc = nv?.viewControllers.first as? WeatherDetailViewController
         
         guard let index = vc?.pageIndex else {
             return nil
         }
         
-        return index == 0 ? nil : self.viewController(at: index - 1)
+        return index == 0 ? nil : UINavigationController(rootViewController: self.viewController(at: index - 1)!)
     }
     
     // 다음 페이지에 대한 정보를 구한다
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        let vc = viewController as? WeatherDetailViewController
-        
+        let nv = viewController as? UINavigationController
+        let vc = nv?.viewControllers.first as? WeatherDetailViewController
+
         guard let index = vc?.pageIndex else {
             return nil
         }
-        return index == self.cities.count ? nil : self.viewController(at: index + 1)
+        return index == self.cities.count - 1 ? nil : UINavigationController(rootViewController: self.viewController(at: index + 1)!)
     }
     
     func presentationCount(for pageViewController: UIPageViewController) -> Int {
@@ -87,21 +94,10 @@ extension WeatherDetailPageViewController: UIPageViewControllerDataSource {
 }
 
 extension WeatherDetailPageViewController: WeatherDetailViewControllerDelegate {
-    func scrollDown() {
+    func listButtonClicked() {
         DispatchQueue.main.async {
-            self.navigationController?.setNavigationBarHidden(false, animated: true)
-        }
-    }
-    
-    func scrollUp() {
-        DispatchQueue.main.async {
-            self.navigationController?.setNavigationBarHidden(true, animated: true)
-        }
-    }
-    
-    func viewDidLoadCalled(_ index: Int) {
-        DispatchQueue.main.async {
-            self.title = self.cities[index].name
+            self.navigationController?.navigationBar.isHidden = false
+            self.navigationController?.popViewController(animated: true)
         }
     }
 }
