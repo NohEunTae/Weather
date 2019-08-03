@@ -77,7 +77,7 @@ class WeatherListViewController: UIViewController {
                     switch result {
                     case .success:
                         self.jsonParser.delegate = self
-                        self.jsonParser.startParsing(data: validData, parsingType: .cities, savedCities: cities)
+                        self.jsonParser.startParsing(data: validData, parsingType: .cities, defaultCities: cities)
                     case .failed:
                         print("failed")
                     }
@@ -141,10 +141,19 @@ extension WeatherListViewController: JsonParserDelegate {
 }
 
 extension WeatherListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailPageViewController = WeatherDetailPageViewController(startIndex: indexPath.row, cities: conciseCites)
+        DispatchQueue.main.async {
+            self.navigationController?.pushViewController(detailPageViewController, animated: true)
+        }
+    }
+}
+
+extension WeatherListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if (editingStyle == .delete) {
             if let data = UserDefaults.standard.value(forKey: "city") as? Data {
@@ -159,9 +168,7 @@ extension WeatherListViewController: UITableViewDelegate {
             }
         }
     }
-}
 
-extension WeatherListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return conciseCites.count
     }

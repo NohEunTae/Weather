@@ -16,4 +16,8 @@ extension Double {
     func celsiusToKalvin() -> Double {
         return self + 273.15
     }
+    
+    func fahrenheitToCelsius() -> Double {
+        return (self - 32) * 5 / 9
+    }
 }
