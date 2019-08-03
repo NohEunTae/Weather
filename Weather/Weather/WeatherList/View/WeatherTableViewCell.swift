@@ -9,6 +9,8 @@
 import UIKit
 
 class WeatherTableViewCell: UITableViewCell {
+    
+    @IBOutlet weak var gpsContainer: UIView!
     @IBOutlet weak var time: UILabel!
     @IBOutlet weak var cityName: UILabel!
     @IBOutlet weak var weatherIcon: UIImageView!
@@ -16,6 +18,7 @@ class WeatherTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        gpsContainer.isHidden = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -39,6 +42,13 @@ class WeatherTableViewCell: UITableViewCell {
             self.cityName.text = conciseCity.name
             self.temperature.text = "\(Int(conciseCity.temp.kalvinToCelsius()))°"
             
+            self.setNeedsLayout()
+        }
+    }
+    
+    func showUserGps() {
+        DispatchQueue.main.async {
+            self.gpsContainer.isHidden = false
             self.setNeedsLayout()
         }
     }
