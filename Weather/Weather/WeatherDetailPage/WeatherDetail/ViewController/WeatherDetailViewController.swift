@@ -17,9 +17,18 @@ class WeatherDetailViewController: UIViewController {
     private var jsonParser = JsonParser()
     private let urlPath: String
     private let city: ConciseCity
+    private let clock: Clock = Clock()
     @IBOutlet weak var weatherDetailTableView: UITableView!
+    private let titleView = TitleView()
     
-    private var detailCity: DetailCity?
+    private var detailCity: DetailCity? {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.titleView.update(subtitle: Date().toString(timezone: self.city.timezone, dateFormat: "a h:mm"))
+            }
+        }
+    }
     weak var delegate: WeatherDetailViewControllerDelegate? = nil
     
     var pageIndex = Int()
@@ -38,13 +47,37 @@ class WeatherDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = city.name
         
+        setupNavigationBarItems()
+        setupTableView()
+        clock.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        clock.startClock()
+        fetchData()
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.stopClock()
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.startClock()
+            self?.fetchData()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.removeObserver(self)
+        clock.stopClock()
+    }
+    
+    func setupNavigationBarItems() {
+        self.navigationItem.titleView = titleView
+        titleView.set(city.name, subtitle: Date().toString(timezone: city.timezone, dateFormat: "a h:mm"))
         let listButton = UIBarButtonItem(image: UIImage(named: "list"), style: .plain, target: self, action: #selector(listButtonClicked))
-        
         self.navigationItem.rightBarButtonItem = listButton
-        self.setupTableView()
-        self.fetchData()
     }
     
     func setupTableView() {
@@ -82,6 +115,12 @@ class WeatherDetailViewController: UIViewController {
     
     @objc func listButtonClicked(sender: UIButton) {
         self.delegate?.listButtonClicked()
+    }
+}
+
+extension WeatherDetailViewController: ClockDelegate {
+    func minuteChanged() {
+        fetchData()
     }
 }
 

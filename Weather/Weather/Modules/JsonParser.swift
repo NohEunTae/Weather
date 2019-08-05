@@ -14,6 +14,7 @@ protocol JsonParserDelegate {
 
 struct JsonParser {
     enum ParsingType {
+        case userLocation
         case city
         case cities
         case detail
@@ -24,9 +25,9 @@ struct JsonParser {
     func startParsing(data: Data, parsingType: ParsingType, cityName: String? = nil, defaultCities: [DefaultCity]? = nil, conciseCity: ConciseCity? = nil) {
         let json = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
         switch parsingType {
-        case .city:
+        case .city, .userLocation:
             guard let validCityName = cityName else { return }
-            parsingCity(json: json, cityName: validCityName)
+            parsingCity(json: json, cityName: validCityName, parsingType: parsingType)
         case .cities:
             guard let validCities = defaultCities else { return }
             parsingCities(json: json, defaultCities: validCities)
@@ -36,7 +37,7 @@ struct JsonParser {
         }
     }
     
-    private func parsingCity(json: [String : Any], cityName: String) {
+    private func parsingCity(json: [String : Any], cityName: String, parsingType: ParsingType) {
         let timezoneValue = json["timezone"] as? Int
         
         let weather = json["weather"] as? [[String : Any]]
@@ -57,7 +58,7 @@ struct JsonParser {
         if let timezoneValue = timezoneValue, let timezone = TimeZone(secondsFromGMT: timezoneValue), let temp = temp, let weatherIcon = weatherIcon, let cityID = cityID, let lat = lat, let lon = lon {
             let coordinate = Coordinate(latitude: lat, longitude: lon)
             let conciseCity = ConciseCity(name: cityName, timezone: timezone, temp: temp, weatherIcon: weatherIcon, cityID: cityID, coordinate: coordinate)
-            delegate?.parsingDidFinished(result: conciseCity, parsingType: .city)
+            delegate?.parsingDidFinished(result: conciseCity, parsingType: parsingType)
         }
     }
     
