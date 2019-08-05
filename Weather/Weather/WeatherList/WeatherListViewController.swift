@@ -37,7 +37,6 @@ class WeatherListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
-        setupTableViewDataSource()
         setupLocationManager()
         clock.delegate = self
         
@@ -47,11 +46,21 @@ class WeatherListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         clock.startClock()
-        weatherTableView.reloadData()
+        conciseCities.isEmpty ? setupTableViewDataSource() : updateDataSource()
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.stopClock()
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.startClock()
+            self?.updateDataSource()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
         clock.stopClock()
     }
     
@@ -174,7 +183,7 @@ extension WeatherListViewController: JsonParserDelegate {
                         }
                         self.navigationItem.rightBarButtonItem?.isEnabled = false
                     }
-                    self.weatherTableView.reloadData()
+                    self.weatherTableView.insertRows(at: [IndexPath(item: 0, section: 0)], with: .fade)
                 }
             }
         case .city:
@@ -229,7 +238,7 @@ extension WeatherListViewController: UITableViewDataSource {
             conciseCities.remove(at: removeIndex)
             DispatchQueue.main.async {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
-                self.weatherTableView.reloadData()
+                tableView.deleteRows(at: [indexPath], with: .automatic)
             }
         }
     }

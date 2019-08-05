@@ -27,6 +27,7 @@ class WeatherDetailPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
+        self.navigationItem.setHidesBackButton(true, animated: false)
         self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         self.pageViewController.dataSource = self
 
@@ -51,6 +52,10 @@ class WeatherDetailPageViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
 
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     // 특정 index에 해당하는 viewcontroller를 구한다
     func viewController(at index: Int) -> WeatherDetailViewController? {
         if (self.cities.isEmpty || self.cities.count <= index) {

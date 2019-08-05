@@ -41,7 +41,7 @@ class WeatherTableViewCell: UITableViewCell {
             self.time.text = Date().toString(timezone: conciseCity.timezone, dateFormat: "a h:mm")
             self.cityName.text = conciseCity.name
             self.temperature.text = "\(Int(conciseCity.temp.kalvinToCelsius()))°"
-            
+            self.gpsContainer.isHidden = true
             self.setNeedsLayout()
         }
     }
