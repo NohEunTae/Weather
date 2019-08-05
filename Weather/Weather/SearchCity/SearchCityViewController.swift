@@ -11,7 +11,9 @@ import MapKit
 
 class SearchCityViewController: UIViewController {
     var isCancelButtonClicked = false
-    weak var delegate: SearchResultTableViewControllerDelegate? = nil
+    @IBOutlet weak var indicator: UIActivityIndicatorView!
+    
+    weak var delegate: SearchResultViewControllerDelegate? = nil
     
     init() {
         super.init(nibName: "SearchCityViewController", bundle: nil)
@@ -30,7 +32,7 @@ class SearchCityViewController: UIViewController {
         self.title = "도시 이름 입력"
         self.navigationItem.setHidesBackButton(true, animated: true)
         
-        let tableViewController = SearchResultTableViewController()
+        let tableViewController = SearchResultViewController()
         tableViewController.delegate = self
         let searchController = UISearchController(searchResultsController: tableViewController)
         navigationItem.searchController = searchController
@@ -66,7 +68,7 @@ extension SearchCityViewController: UISearchBarDelegate {
     }
 }
 
-extension SearchCityViewController: SearchResultTableViewControllerDelegate {
+extension SearchCityViewController: SearchResultViewControllerDelegate {
     func searchDidFinished(item: MKMapItem) {
         DispatchQueue.main.async { [unowned self] in
             self.navigationController?.popViewController(animated: true)

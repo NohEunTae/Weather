@@ -12,6 +12,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchCityViewController" customModule="Weather" customModuleProvider="target">
             <connections>
+                <outlet property="indicator" destination="DfC-OQ-xim" id="hqV-OU-xGq"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,7 +20,20 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="DfC-OQ-xim">
+                    <rect key="frame" x="177.5" y="323.5" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="0RV-G3-7Ua"/>
+                        <constraint firstAttribute="width" constant="20" id="qKe-MH-dZq"/>
+                    </constraints>
+                </activityIndicatorView>
+            </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="DfC-OQ-xim" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="OHD-RX-Tcx"/>
+                <constraint firstItem="DfC-OQ-xim" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="jlK-M9-sXk"/>
+            </constraints>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
         </view>
     </objects>

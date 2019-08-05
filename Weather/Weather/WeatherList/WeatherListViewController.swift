@@ -87,7 +87,7 @@ class WeatherListViewController: UIViewController {
     }
 }
 
-extension WeatherListViewController: SearchResultTableViewControllerDelegate {
+extension WeatherListViewController: SearchResultViewControllerDelegate {
     func searchDidFinished(item: MKMapItem) {
         let urlPath = String(format: "https://api.openweathermap.org/data/2.5/weather?lat=%lf&lon=%lf&appid=\(self.openWeatherKey)", item.placemark.coordinate.latitude, item.placemark.coordinate.longitude)
         Network.request(urlPath: urlPath) { (result, data) in
