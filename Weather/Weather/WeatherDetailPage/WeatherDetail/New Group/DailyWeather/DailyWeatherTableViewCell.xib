@@ -25,7 +25,7 @@
                             <constraint firstAttribute="height" constant="22" id="8Bc-MZ-Zhc"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="p61-U0-dZE">
@@ -52,10 +52,11 @@
                             <constraint firstAttribute="width" constant="21" id="ZNk-eK-Byh"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
+                <color key="backgroundColor" red="0.1215686275" green="0.12941176469999999" blue="0.14117647059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <constraints>
                     <constraint firstItem="p61-U0-dZE" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="4m4-cw-NUJ"/>
                     <constraint firstItem="Bzf-bM-QTl" firstAttribute="leading" secondItem="NTV-Yr-HqX" secondAttribute="trailing" constant="25" id="DCX-ps-Q5v"/>

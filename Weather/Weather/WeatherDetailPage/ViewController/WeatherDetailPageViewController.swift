@@ -33,9 +33,9 @@ class WeatherDetailPageViewController: UIViewController {
         navigationItem.setHidesBackButton(true, animated: false)
         
         let pageControl = UIPageControl.appearance(whenContainedInInstancesOf: [WeatherDetailPageViewController.self])
-        pageControl.currentPageIndicatorTintColor = UIColor.gray
-        pageControl.pageIndicatorTintColor = UIColor(red: (240/255), green: (240/255), blue: (240/255), alpha: 1)
-        pageControl.backgroundColor = UIColor.white
+        pageControl.currentPageIndicatorTintColor = UIColor.white
+        pageControl.pageIndicatorTintColor = UIColor.darkGray
+        pageControl.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
         pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         pageViewController.dataSource = self
         pageViewController.delegate = self

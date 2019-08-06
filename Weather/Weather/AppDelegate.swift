@@ -17,14 +17,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        
         let weatherListViewController = WeatherListViewController()
         let rootNavigationController = UINavigationController(rootViewController: weatherListViewController)
-        
         self.window?.rootViewController = rootNavigationController
         self.window?.makeKeyAndVisible()
+
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+        UINavigationBar.appearance().setBackgroundImage(UIImage(), for: .default)
+        UINavigationBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UINavigationBar.appearance().isTranslucent = true
+        UINavigationBar.appearance().tintColor = .white
         
-        UINavigationBar.appearance().tintColor = .black
+        UISearchBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+
         return true
     }
 
