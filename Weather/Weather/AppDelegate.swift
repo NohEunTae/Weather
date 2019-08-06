@@ -17,14 +17,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        
         let weatherListViewController = WeatherListViewController()
         let rootNavigationController = UINavigationController(rootViewController: weatherListViewController)
-        
         self.window?.rootViewController = rootNavigationController
         self.window?.makeKeyAndVisible()
-        
-        UINavigationBar.appearance().tintColor = .black
+
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+        UINavigationBar.appearance().setBackgroundImage(UIImage(), for: .default)
+        UINavigationBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UINavigationBar.appearance().isTranslucent = true
+        UINavigationBar.appearance().tintColor = .white
+        UIApplication.shared.statusBarView?.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+
+        UISearchBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         return true
     }
 
@@ -49,7 +55,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 
+extension UIApplication {
+    var statusBarView: UIView? {
+        if responds(to: Selector(("statusBar"))) {
+            return value(forKey: "statusBar") as? UIView
+        }
+        return nil
+    }
+}

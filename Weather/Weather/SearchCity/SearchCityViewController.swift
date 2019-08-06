@@ -30,11 +30,14 @@ class SearchCityViewController: UIViewController {
     
     func setupNavigationBar() {
         self.title = "도시 이름 입력"
+        
         self.navigationItem.setHidesBackButton(true, animated: true)
         
         let tableViewController = SearchResultViewController()
         tableViewController.delegate = self
         let searchController = UISearchController(searchResultsController: tableViewController)
+        searchController.searchBar.tintColor = .white
+        searchController.searchBar.barTintColor = .white
         navigationItem.searchController = searchController
         navigationItem.searchController?.searchResultsUpdater = tableViewController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -45,6 +48,7 @@ class SearchCityViewController: UIViewController {
 }
 
 extension SearchCityViewController: UISearchControllerDelegate {
+    
     func didDismissSearchController(_ searchController: UISearchController) {
         if isCancelButtonClicked {
             DispatchQueue.main.async { [unowned self] in
@@ -73,6 +77,12 @@ extension SearchCityViewController: SearchResultViewControllerDelegate {
         DispatchQueue.main.async { [unowned self] in
             self.navigationController?.popViewController(animated: true)
             self.delegate?.searchDidFinished(item: item)
+        }
+    }
+    
+    func tableViewBeginDragging() {
+        DispatchQueue.main.async {
+            self.navigationItem.searchController?.searchBar.resignFirstResponder()
         }
     }
 }

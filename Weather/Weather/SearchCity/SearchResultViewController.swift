@@ -11,16 +11,23 @@ import MapKit
 
 protocol SearchResultViewControllerDelegate: AnyObject {
     func searchDidFinished(item: MKMapItem)
+    func tableViewBeginDragging()
+}
+
+extension SearchResultViewControllerDelegate {
+    func tableViewBeginDragging() {}
 }
 
 class SearchResultViewController: UIViewController {
 
     @IBOutlet weak var searchIndicator: UIActivityIndicatorView!
     @IBOutlet weak var resultTableView: UITableView!
-    private var search: MKLocalSearch? = nil
     private let completer = MKLocalSearchCompleter()
     var matchingItems: [MKMapItem] = []
-
+    
+    var memorizingItems: [String : [MKMapItem]] = [:]
+    weak var timer: Timer? = nil
+    
     weak var delegate: SearchResultViewControllerDelegate? = nil
 
     init() {
@@ -34,12 +41,17 @@ class SearchResultViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         completer.delegate = self
-        
+        self.resultTableView.keyboardDismissMode = .interactive
         self.resultTableView.delegate = self
         self.resultTableView.dataSource = self
         let nibCell = UINib(nibName: "SearchCityTableViewCell", bundle: nil)
         resultTableView.register(nibCell, forCellReuseIdentifier: "SearchCityTableViewCell")
+    }
+}
 
+extension SearchResultViewController: UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.delegate?.tableViewBeginDragging()
     }
 }
 
@@ -67,56 +79,84 @@ extension SearchResultViewController: UITableViewDataSource {
 extension SearchResultViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchBarText = searchController.searchBar.text else { return }
-        DispatchQueue.main.async {
-            self.resultTableView.isHidden = true
-            self.searchIndicator.startAnimating()
-        }
         
         if completer.isSearching {
-            self.matchingItems.removeAll()
             self.completer.cancel()
+        }
+        
+        if let isMemorized = memorizingItems[searchBarText] {
+            matchingItems = isMemorized
             DispatchQueue.main.async {
+                self.resultTableView.isHidden = false
+                self.searchIndicator.stopAnimating()
                 self.resultTableView.reloadData()
             }
+        } else {
+            let maybeInclude = memorizingItems.keys.filter { searchBarText.contains($0)}.last
+            if let include = maybeInclude {
+                let maybeItems = self.memorizingItems[include]?.filter { $0.placemark.title != nil}.filter { $0.placemark.title!.contains(searchBarText)}
+                if let items = maybeItems {
+                    self.memorizingItems.updateValue(items, forKey: searchBarText)
+                    matchingItems = items
+                }
+            }
+            timer?.invalidate()
+            timer = nil
+            timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(timerFunc), userInfo: searchBarText, repeats: false)
+            DispatchQueue.main.async {
+                self.resultTableView.isHidden = true
+                self.searchIndicator.startAnimating()
+            }
         }
-        completer.queryFragment = searchBarText
+    }
+    
+    @objc func timerFunc(_ timer: Timer) {
+        completer.queryFragment = timer.userInfo as! String
     }
 }
 
 extension SearchResultViewController: MKLocalSearchCompleterDelegate {
     
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        
+        self.matchingItems.removeAll()
+
         let overlapData = completer.results.filter { $0.subtitle == "" }
         var maybeCities: [String] = []
-        
+
         for item in overlapData {
             let split = item.title.split(separator: ",").map { String($0) }
-            
             for string in split {
                 if string.contains(completer.queryFragment), !maybeCities.contains(string) {
                     maybeCities.append(string)
-                    print(string)
                     break
+                }
+            }
+        }
+
+        if let memorizedItems = memorizingItems[completer.queryFragment] {
+            self.matchingItems.append(contentsOf: memorizedItems)
+            for item in memorizedItems {
+                let maybeInclude = maybeCities.filter { $0.contains(item.placemark.title!)}
+                for item in maybeInclude {
+                    maybeCities.remove(at: maybeCities.firstIndex(of: item)!)
                 }
             }
         }
         
         let group = DispatchGroup()
+        let request = MKLocalSearch.Request()
         for maybeCity in maybeCities {
             group.enter()
-            let request = MKLocalSearch.Request()
             request.naturalLanguageQuery = maybeCity
             let search = MKLocalSearch(request: request)
-            search.start { [unowned self] response, _ in
+            search.start { [unowned self] response, error in
                 guard let response = response else {
                     group.leave()
                     return
                 }
-                
                 for item in response.mapItems {
-                    let names = self.matchingItems.map { $0.name }
-                    if !names.contains(item.name) {
+                    let titles = self.matchingItems.map { $0.placemark.title }
+                    if let title = item.placemark.title, !titles.contains(title), title.contains(completer.queryFragment) {
                         self.matchingItems.append(item)
                     }
                 }
@@ -125,6 +165,7 @@ extension SearchResultViewController: MKLocalSearchCompleterDelegate {
         }
         
         group.notify(queue: .main) {
+            self.memorizingItems.updateValue(self.matchingItems, forKey: completer.queryFragment)
             self.searchIndicator.stopAnimating()
             self.resultTableView.isHidden = false
             self.resultTableView.reloadData()

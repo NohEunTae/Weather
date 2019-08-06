@@ -15,7 +15,7 @@ class TitleView: UIStackView {
     func set(_ title: String, subtitle: String) {
         titleLabel.text = title
         titleLabel.font = .preferredFont(forTextStyle: UIFont.TextStyle.headline)
-        titleLabel.textColor = .black
+        titleLabel.textColor = .white
         
         subtitleLabel.text = subtitle
         subtitleLabel.font = .preferredFont(forTextStyle: UIFont.TextStyle.footnote)

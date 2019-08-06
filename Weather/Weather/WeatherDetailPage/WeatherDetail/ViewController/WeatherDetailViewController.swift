@@ -47,7 +47,6 @@ class WeatherDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupNavigationBarItems()
         setupTableView()
         clock.delegate = self
@@ -74,6 +73,8 @@ class WeatherDetailViewController: UIViewController {
     }
     
     func setupNavigationBarItems() {
+        let bar:UINavigationBar! =  self.navigationController?.navigationBar
+        bar.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
         self.navigationItem.titleView = titleView
         titleView.set(city.name, subtitle: Date().toString(timezone: city.timezone, dateFormat: "a h:mm"))
         let listButton = UIBarButtonItem(image: UIImage(named: "list"), style: .plain, target: self, action: #selector(listButtonClicked))
