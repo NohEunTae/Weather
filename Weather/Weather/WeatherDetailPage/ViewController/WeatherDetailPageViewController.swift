@@ -10,11 +10,10 @@ import UIKit
 
 class WeatherDetailPageViewController: UIViewController {
     
-    var pageViewController: UIPageViewController!
-    var cities: [ConciseCity]
-    let startIndex: Int
-    
-    var currentIndex: Int
+    private var pageViewController: UIPageViewController!
+    private var cities: [ConciseCity]
+    private let startIndex: Int
+    private var currentIndex: Int
     
     init (startIndex: Int, cities: [ConciseCity]) {
         self.startIndex = startIndex
@@ -32,6 +31,17 @@ class WeatherDetailPageViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         navigationItem.setHidesBackButton(true, animated: false)
         
+        initialSetupPageController { [weak self] in
+            guard let self = self else { return }
+            self.setupPageViewController(index: startIndex)
+        }
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
+    func initialSetupPageController(completion: ()->() ) {
         let pageControl = UIPageControl.appearance(whenContainedInInstancesOf: [WeatherDetailPageViewController.self])
         pageControl.currentPageIndicatorTintColor = UIColor.white
         pageControl.pageIndicatorTintColor = UIColor.darkGray
@@ -39,22 +49,13 @@ class WeatherDetailPageViewController: UIViewController {
         pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         pageViewController.dataSource = self
         pageViewController.delegate = self
-        setupPageViewController(index: startIndex)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-
-    override var prefersStatusBarHidden: Bool {
-        return true
+        completion()
     }
     
     func setupPageViewController(index: Int) {
-        DispatchQueue.main.async {
-            guard let maybefirstViewController = self.viewController(at: index) else {
-                return
-            }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let maybefirstViewController = self.viewController(at: index) else { return }
+            
             let startingViewController: WeatherDetailViewController = maybefirstViewController
             let startingNavigationController = UINavigationController(rootViewController: startingViewController)
             let viewControllers = [startingNavigationController]
@@ -72,11 +73,11 @@ class WeatherDetailPageViewController: UIViewController {
     
     // 특정 index에 해당하는 viewcontroller를 구한다
     func viewController(at index: Int) -> WeatherDetailViewController? {
-        if (self.cities.isEmpty || self.cities.count <= index) {
+        if (cities.isEmpty || cities.count <= index) {
             return nil
         }
         
-        let dataViewController = WeatherDetailViewController(city: self.cities[index], index: index)
+        let dataViewController = WeatherDetailViewController(city: cities[index], index: index)
         dataViewController.delegate = self
         return dataViewController
     }
@@ -113,23 +114,23 @@ extension WeatherDetailPageViewController: UIPageViewControllerDataSource {
         guard let index = vc?.pageIndex else {
             return nil
         }
-        return index == self.cities.count - 1 ? nil : UINavigationController(rootViewController: self.viewController(at: index + 1)!)
+        return index == cities.count - 1 ? nil : UINavigationController(rootViewController: self.viewController(at: index + 1)!)
     }
     
     func presentationCount(for pageViewController: UIPageViewController) -> Int {
-        return self.cities.count
+        return cities.count
     }
     
     func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-        return self.currentIndex
+        return currentIndex
     }
 }
 
 extension WeatherDetailPageViewController: WeatherDetailViewControllerDelegate {
     func listButtonClicked() {
-        DispatchQueue.main.async {
-            self.navigationController?.navigationBar.isHidden = false
-            self.navigationController?.popViewController(animated: true)
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.navigationBar.isHidden = false
+            self?.navigationController?.popViewController(animated: true)
         }
     }
 }

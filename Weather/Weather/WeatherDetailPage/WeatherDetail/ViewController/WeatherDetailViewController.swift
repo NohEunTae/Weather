@@ -20,7 +20,8 @@ class WeatherDetailViewController: UIViewController {
     private let clock: Clock = Clock()
     @IBOutlet weak var weatherDetailTableView: UITableView!
     private let titleView = TitleView()
-    
+    weak var delegate: WeatherDetailViewControllerDelegate? = nil
+    var pageIndex = Int()
     private var detailCity: DetailCity? {
         didSet {
             DispatchQueue.main.async { [weak self] in
@@ -29,15 +30,12 @@ class WeatherDetailViewController: UIViewController {
             }
         }
     }
-    weak var delegate: WeatherDetailViewControllerDelegate? = nil
-    
-    var pageIndex = Int()
-    
+
     init (city: ConciseCity, index: Int) {
-        self.darkSkyKey = "d5a6a5386aeaba96fe2d617545464209"
-        self.urlPath = String(format: "https://api.darksky.net/forecast/\(self.darkSkyKey)/%lf,%lf?lang=ko", city.coordinate.latitude, city.coordinate.longitude)
+        darkSkyKey = "d5a6a5386aeaba96fe2d617545464209"
+        urlPath = String(format: "https://api.darksky.net/forecast/\(darkSkyKey)/%lf,%lf?lang=ko", city.coordinate.latitude, city.coordinate.longitude)
         self.city = city
-        self.pageIndex = index
+        pageIndex = index
         super.init(nibName: "WeatherDetailViewController", bundle: nil)
     }
     
@@ -56,26 +54,30 @@ class WeatherDetailViewController: UIViewController {
         super.viewWillAppear(animated)
         clock.startClock()
         fetchData()
+        setupNotifications()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+        clock.stopClock()
+    }
+    
+    func setupNotifications() {
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] notification in
             self?.clock.stopClock()
         }
-
+        
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] notification in
             self?.clock.startClock()
             self?.fetchData()
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        NotificationCenter.default.removeObserver(self)
-        clock.stopClock()
-    }
-    
     func setupNavigationBarItems() {
-        let bar:UINavigationBar! =  self.navigationController?.navigationBar
+        let bar:UINavigationBar! =  navigationController?.navigationBar
         bar.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
-        self.navigationItem.titleView = titleView
+        navigationItem.titleView = titleView
         titleView.set(city.name, subtitle: Date().toString(timezone: city.timezone, dateFormat: "a h:mm"))
         let listButton = UIBarButtonItem(image: UIImage(named: "list"), style: .plain, target: self, action: #selector(listButtonClicked))
         self.navigationItem.rightBarButtonItem = listButton
@@ -88,34 +90,30 @@ class WeatherDetailViewController: UIViewController {
         let weatherDescriptionTableViewCell = UINib(nibName: "WeatherDescriptionTableViewCell", bundle: nil)
         let todayDetailWeatherTableViewCell = UINib(nibName: "TodayDetailWeatherTableViewCell", bundle: nil)
 
-        self.weatherDetailTableView.delegate = self
-        self.weatherDetailTableView.dataSource = self
-        self.weatherDetailTableView.register(todayWeatherTableViewCell, forCellReuseIdentifier: "TodayWeatherTableViewCell")
-        self.weatherDetailTableView.register(hourlyWeatherTableViewCell, forCellReuseIdentifier: "HourlyWeatherTableViewCell")
-        self.weatherDetailTableView.register(dailyWeatherTableViewCell, forCellReuseIdentifier: "DailyWeatherTableViewCell")
-        self.weatherDetailTableView.register(weatherDescriptionTableViewCell, forCellReuseIdentifier: "WeatherDescriptionTableViewCell")
-        self.weatherDetailTableView.register(todayDetailWeatherTableViewCell, forCellReuseIdentifier: "TodayDetailWeatherTableViewCell")
+        weatherDetailTableView.delegate = self
+        weatherDetailTableView.dataSource = self
+        weatherDetailTableView.register(todayWeatherTableViewCell, forCellReuseIdentifier: "TodayWeatherTableViewCell")
+        weatherDetailTableView.register(hourlyWeatherTableViewCell, forCellReuseIdentifier: "HourlyWeatherTableViewCell")
+        weatherDetailTableView.register(dailyWeatherTableViewCell, forCellReuseIdentifier: "DailyWeatherTableViewCell")
+        weatherDetailTableView.register(weatherDescriptionTableViewCell, forCellReuseIdentifier: "WeatherDescriptionTableViewCell")
+        weatherDetailTableView.register(todayDetailWeatherTableViewCell, forCellReuseIdentifier: "TodayDetailWeatherTableViewCell")
     }
     
     func fetchData() {
-        Network.request(urlPath: urlPath) { [unowned self] (result, data) in
-            guard let validData = data else {
-                print("invalid data")
-                return
-            }
-            
+        Network.request(urlPath: urlPath) { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success:
+            case .success(let data):
                 self.jsonParser.delegate = self
-                self.jsonParser.startParsing(data: validData, parsingType: .detail, conciseCity: self.city)
-            case .failed:
-                print("failed")
+                self.jsonParser.startParsing(data: data, parsingType: .detail, conciseCity: self.city)
+            case .failed(let error):
+                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
             }
         }
     }
     
     @objc func listButtonClicked(sender: UIButton) {
-        self.delegate?.listButtonClicked()
+        delegate?.listButtonClicked()
     }
 }
 
@@ -129,10 +127,10 @@ extension WeatherDetailViewController: JsonParserDelegate {
     func parsingDidFinished<T>(result: T, parsingType: JsonParser.ParsingType) {
         switch parsingType {
         case .detail:
-            self.detailCity = result as? DetailCity
-            guard self.detailCity != nil else { return }
-            DispatchQueue.main.async {
-                self.weatherDetailTableView.reloadData()
+            detailCity = result as? DetailCity
+            guard detailCity != nil else { return }
+            DispatchQueue.main.async { [weak self] in
+                self?.weatherDetailTableView.reloadData()
             }
         default:
             break

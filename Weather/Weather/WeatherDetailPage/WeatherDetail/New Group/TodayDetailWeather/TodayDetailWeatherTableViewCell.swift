@@ -35,7 +35,8 @@ class TodayDetailWeatherTableViewCell: UITableViewCell {
     func modifyCell(with detailCity: DetailCity, detailType: DetailType) {
         switch detailType {
         case .sunriseAndSunset:
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.leftTitle.text = "일출"
                 self.rightTitle.text = "일몰"
                 self.leftContent.text = Date(timeIntervalSince1970: detailCity.sunrise).toString(timezone: detailCity.timezone, dateFormat: "a h:mm")
@@ -43,7 +44,8 @@ class TodayDetailWeatherTableViewCell: UITableViewCell {
                 self.setNeedsLayout()
             }
         case .precipProbabilityAndHumidity:
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.leftTitle.text = "비 올 확률"
                 self.rightTitle.text = "습도"
                 self.leftContent.text = "\(Int(detailCity.precipProbability * 100))%"
@@ -51,7 +53,8 @@ class TodayDetailWeatherTableViewCell: UITableViewCell {
                 self.setNeedsLayout()
             }
         case .windAndApparentTemperatur:
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.leftTitle.text = "바람"
                 self.rightTitle.text = "체감"
                 
@@ -63,7 +66,8 @@ class TodayDetailWeatherTableViewCell: UITableViewCell {
                 self.setNeedsLayout()
             }
         case .precipIntensityAndPressure:
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.leftTitle.text = "강수량"
                 self.rightTitle.text = "기압"
                 self.leftContent.text = "\(Int(detailCity.precipIntensity * 10))cm"
@@ -71,14 +75,14 @@ class TodayDetailWeatherTableViewCell: UITableViewCell {
                 self.setNeedsLayout()
             }
         case .visibilityAndUvIndex:
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.leftTitle.text = "가시거리"
                 self.rightTitle.text = "자외선 지수"
                 self.leftContent.text = String(format: "%.1fkm", arguments: [detailCity.visibility])
                 self.rightContent.text = "\(detailCity.uvIndex)"
                 self.setNeedsLayout()
             }
-            break
         }
     }
 

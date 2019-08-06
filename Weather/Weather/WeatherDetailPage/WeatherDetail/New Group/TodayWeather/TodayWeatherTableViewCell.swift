@@ -25,7 +25,8 @@ class TodayWeatherTableViewCell: UITableViewCell {
     }
     
     func modifyCell(with detailCity: DetailCity) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             self.weatherIcon.image = UIImage(named: detailCity.weatherIcon)!
             self.summary.text = detailCity.summary
             self.temp.text = "\(Int(detailCity.temp.fahrenheitToCelsius()))°"

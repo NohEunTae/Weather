@@ -26,18 +26,19 @@ class WeatherTableViewCell: UITableViewCell {
     }
     
     func modifyCell(with conciseCity: ConciseCity) {
-        let url = URL(string: "http://openweathermap.org/img/wn/\(conciseCity.weatherIcon)@2x.png")
-        if let url = url {
-            self.downloadImage(from: url, completion: { [weak self] image in
-                if let image = image {
-                    DispatchQueue.main.async {
-                        self?.weatherIcon.image = image
-                    }
+        Network.request(urlPath: "http://openweathermap.org/img/wn/\(conciseCity.weatherIcon)@2x.png") { result in
+            switch result {
+            case .success(let data):
+                DispatchQueue.main.async { [weak self] in
+                    self?.weatherIcon.image = UIImage(data: data)
                 }
-            })
+            case .failed:
+                break
+            }
         }
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             self.time.text = Date().toString(timezone: conciseCity.timezone, dateFormat: "a h:mm")
             self.cityName.text = conciseCity.name
             self.temperature.text = "\(Int(conciseCity.temp.kalvinToCelsius()))°"
@@ -47,9 +48,9 @@ class WeatherTableViewCell: UITableViewCell {
     }
     
     func showUserGps() {
-        DispatchQueue.main.async {
-            self.gpsContainer.isHidden = false
-            self.setNeedsLayout()
+        DispatchQueue.main.async { [weak self] in
+            self?.gpsContainer.isHidden = false
+            self?.setNeedsLayout()
         }
     }
 }

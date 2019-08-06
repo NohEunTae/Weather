@@ -15,12 +15,15 @@ class HourlyWeatherTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
-        self.hourlyCollectionView.delegate = self
-        self.hourlyCollectionView.dataSource = self
+        setupCollcetionView()
+    }
+    
+    func setupCollcetionView() {
+        hourlyCollectionView.delegate = self
+        hourlyCollectionView.dataSource = self
         
         let nibCell = UINib(nibName: "HourlyWeatherCollectionViewCell", bundle: nil)
-        self.hourlyCollectionView.register(nibCell, forCellWithReuseIdentifier: "HourlyWeatherCollectionViewCell")
+        hourlyCollectionView.register(nibCell, forCellWithReuseIdentifier: "HourlyWeatherCollectionViewCell")
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -23,12 +23,12 @@ class DailyWeatherTableViewCell: UITableViewCell {
     }
     
     func modifyCell(with dailyWeather: DailyWeather, timezone: TimeZone) {
-        DispatchQueue.main.async {
-            self.day.text = Date(timeIntervalSince1970: dailyWeather.timeInterval).toString(timezone: timezone, dateFormat: "EEEE")
-            self.weatherIcon.image = UIImage(named: dailyWeather.weatherIcon)!
-            self.tempMax.text = "\(Int(dailyWeather.tempMax.fahrenheitToCelsius()))"
-            self.tempMin.text = "\(Int(dailyWeather.tempMin.fahrenheitToCelsius()))"
-            self.setNeedsLayout()
+        DispatchQueue.main.async { [weak self] in
+            self?.day.text = Date(timeIntervalSince1970: dailyWeather.timeInterval).toString(timezone: timezone, dateFormat: "EEEE")
+            self?.weatherIcon.image = UIImage(named: dailyWeather.weatherIcon)!
+            self?.tempMax.text = "\(Int(dailyWeather.tempMax.fahrenheitToCelsius()))"
+            self?.tempMin.text = "\(Int(dailyWeather.tempMin.fahrenheitToCelsius()))"
+            self?.setNeedsLayout()
         }
     }
 }

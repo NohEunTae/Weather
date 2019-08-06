@@ -20,7 +20,8 @@ class WeatherDescriptionTableViewCell: UITableViewCell {
     }
     
     func modifyCell(with detailCity: DetailCity) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             self.weatherDescription.text = "오늘: 현재 날씨 \(detailCity.summary). 현재 기온은 \(Int(detailCity.temp.fahrenheitToCelsius()))°이며 최고 기온은 \(Int(detailCity.tempMax.fahrenheitToCelsius()))°입니다."
             self.setNeedsLayout()
         }

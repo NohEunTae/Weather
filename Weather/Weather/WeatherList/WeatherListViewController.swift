@@ -30,7 +30,6 @@ class WeatherListViewController: UIViewController {
     
     private var userCity: ConciseCity? = nil
     private weak var delegate: WeatherListViewControllerDelegate? = nil
-    
     init() {
         super.init(nibName: "WeatherListViewController", bundle: nil)
     }
@@ -44,28 +43,16 @@ class WeatherListViewController: UIViewController {
         setupTableView()
         setupTableViewDataSource()
         setupLocationManager()
-        self.setNeedsStatusBarAppearanceUpdate()
 
         clock.delegate = self
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        self.navigationController?.navigationBar.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
-        self.navigationController?.navigationBar.isTranslucent = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
     }
         
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        DispatchQueue.main.async {
-            self.weatherTableView.reloadData()
-        }
+        self.weatherTableView.reloadData()
         clock.startClock()
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] notification in
-            self?.clock.stopClock()
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] notification in
-            self?.clock.startClock()
-        }
+        setupNotifications()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -74,8 +61,21 @@ class WeatherListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    func setupNotifications() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.stopClock()
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.clock.startClock()
+            DispatchQueue.main.async { [weak self] in
+                self?.weatherTableView.reloadData()
+            }
+        }
+    }
+    
     func setupLocationManager() {
-        self.locationManager.requestAlwaysAuthorization()
+        locationManager.requestAlwaysAuthorization()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         if CLLocationManager.locationServicesEnabled() {
@@ -85,15 +85,17 @@ class WeatherListViewController: UIViewController {
     
     func setupTableView() {
         let nibCell = UINib(nibName: "WeatherTableViewCell", bundle: nil)
-        self.weatherTableView.delegate = self
-        self.weatherTableView.dataSource = self        
-        self.weatherTableView.register(nibCell, forCellReuseIdentifier: "WeatherTableViewCell")
+        weatherTableView.delegate = self
+        weatherTableView.dataSource = self
+        weatherTableView.register(nibCell, forCellReuseIdentifier: "WeatherTableViewCell")
     }
     
     @objc func addTapped(sender: UIBarButtonItem) {
         let searchCityViewController = SearchCityViewController()
         searchCityViewController.delegate = self
-        self.navigationController?.pushViewController(searchCityViewController, animated: true)
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.pushViewController(searchCityViewController, animated: true)
+        }
     }
     
     func setupTableViewDataSource() {
@@ -102,7 +104,7 @@ class WeatherListViewController: UIViewController {
                 if CLLocationManager.locationServicesEnabled(), cities.count == 20 {
                     cities.removeLast()
                 }
-                self.fetchData(defaultCities: cities)
+                fetchData(defaultCities: cities)
             }
         }
     }
@@ -119,28 +121,25 @@ class WeatherListViewController: UIViewController {
         }
 
         let defaultCities: [DefaultCity] = cities.map { DefaultCity(city: $0 as City) }
-        self.fetchData(defaultCities: defaultCities)
+        fetchData(defaultCities: defaultCities)
     }
     
     func fetchData(defaultCities: [DefaultCity]) {
+        guard !defaultCities.isEmpty else { return }
         var totalIds = ""
         for city in defaultCities {
             totalIds += "\(city.cityID),"
         }
         totalIds.removeLast()
         let urlPath = "http://api.openweathermap.org/data/2.5/group?id=\(totalIds)&units=metric&appId=\(self.openWeatherKey)"
-        Network.request(urlPath: urlPath) { (result, data) in
-            guard let validData = data else {
-                print("invalid data")
-                return
-            }
-            
+        Network.request(urlPath: urlPath) { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success:
+            case .success(let data):
                 self.jsonParser.delegate = self
-                self.jsonParser.startParsing(data: validData, parsingType: .cities, defaultCities: defaultCities)
-            case .failed:
-                print("failed")
+                self.jsonParser.startParsing(data: data, parsingType: .cities, defaultCities: defaultCities)
+            case .failed(let error):
+                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
             }
         }
     }
@@ -149,18 +148,14 @@ class WeatherListViewController: UIViewController {
 extension WeatherListViewController: SearchResultViewControllerDelegate {
     func searchDidFinished(item: MKMapItem) {
         let urlPath = String(format: "https://api.openweathermap.org/data/2.5/weather?lat=%lf&lon=%lf&appid=\(self.openWeatherKey)", item.placemark.coordinate.latitude, item.placemark.coordinate.longitude)
-        Network.request(urlPath: urlPath) { (result, data) in
-            guard let validData = data else {
-                print("invalid data")
-                return
-            }
-            
+        Network.request(urlPath: urlPath) { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success:
+            case .success(let data):
                 self.jsonParser.delegate = self
-                self.jsonParser.startParsing(data: validData, parsingType: .city, cityName: item.placemark.name!)
-            case .failed:
-                print("failed")
+                self.jsonParser.startParsing(data: data, parsingType: .city, cityName: item.placemark.name!)
+            case .failed(let error):
+                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
             }
         }
     }
@@ -175,14 +170,16 @@ extension WeatherListViewController: CLLocationManagerDelegate {
         case.restricted:
             fallthrough
         case .denied:
-            self.delegate?.deleteUserWeather()
-            self.userCity = nil
-            self.weatherTableView.reloadSections([0], with: .automatic)
-            if !self.conciseCities.isEmpty { self.updateDataSource() }
+            delegate?.deleteUserWeather()
+            userCity = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.navigationItem.rightBarButtonItem?.isEnabled = true
+                self?.weatherTableView.reloadSections([0], with: .automatic)
+            }
         case .authorizedAlways:
             fallthrough
         case .authorizedWhenInUse:
-            if self.userCity == nil {
+            if userCity == nil {
                 locationManager.startUpdatingLocation()
             }
         }
@@ -190,20 +187,18 @@ extension WeatherListViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let currentLocation = locations.last {
-            CLGeocoder().reverseGeocodeLocation(currentLocation, completionHandler: { (placemarks, error) in
+            CLGeocoder().reverseGeocodeLocation(currentLocation, completionHandler: { [weak self] (placemarks, error) in
+                guard let self = self else { return }
                 if error == nil, let placemarks = placemarks, !placemarks.isEmpty {
                     let urlPath = String(format: "https://api.openweathermap.org/data/2.5/weather?lat=%lf&lon=%lf&appid=\(self.openWeatherKey)", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)
-                    Network.request(urlPath: urlPath) { (result, data) in
-                        guard let validData = data else {
-                            print("invalid data")
-                            return
-                        }
+                    Network.request(urlPath: urlPath) { [weak self] result in
+                        guard let self = self else { return }
                         switch result {
-                        case .success:
+                        case .success(let data):
                             self.jsonParser.delegate = self
-                            self.jsonParser.startParsing(data: validData, parsingType: .userLocation, cityName: placemarks.last!.cityName())
-                        case .failed:
-                            print("failed")
+                            self.jsonParser.startParsing(data: data, parsingType: .userLocation, cityName: placemarks.last!.cityName())
+                        case .failed(let error):
+                            self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
                         }
                     }
                 }
@@ -214,44 +209,45 @@ extension WeatherListViewController: CLLocationManagerDelegate {
 }
 
 extension WeatherListViewController: JsonParserDelegate {
+    private var dataSourceCount: Int {
+        let userCount = userCity == nil ? 0 : 1
+        return userCount + conciseCities.count
+    }
+
     func parsingDidFinished<T>(result: T, parsingType: JsonParser.ParsingType) {
         switch parsingType {
         case .userLocation:
             if let userCity = result as? ConciseCity {
                 self.delegate?.addUserWeather(user: userCity)
-                DispatchQueue.main.async {
-                    if self.conciseCities.count >= 19 {
-                        self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    }
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.navigationItem.rightBarButtonItem?.isEnabled = self.dataSourceCount >= 19 ? false : true
+
                     self.userCity = userCity
-                    self.weatherTableView.reloadSections([Section.userWeather.rawValue], with: .fade)
+                    self.weatherTableView.reloadSections([Section.userWeather.rawValue], with: .automatic)
                 }
             }
         case .city:
             let conciseCity = result as! ConciseCity
             let isExist = conciseCities.filter { $0.cityID == conciseCity.cityID }
             guard isExist.isEmpty == true else { break }
-            conciseCities.append(conciseCity)
-            let indexPath = IndexPath(row:conciseCities.count - 1, section: Section.savedWeather.rawValue)
-            
-            DispatchQueue.main.async {
-                if self.conciseCities.count == 20 || (self.conciseCities.count == 19 && self.userCity != nil) {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = false
-                }
+
+            let indexPath = IndexPath(row:conciseCities.count, section: Section.savedWeather.rawValue)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.navigationItem.rightBarButtonItem?.isEnabled = self.dataSourceCount >= 19 ? false : true
+                self.conciseCities.append(conciseCity)
                 self.weatherTableView.insertRows(at: [indexPath], with: .automatic)
             }            
         case .cities:
-            let cities = result as! [ConciseCity]
-            if cities.count > conciseCities.count, userCity != nil {
-                self.userCity = cities.first!
-                for i in 1..<cities.count {
-                    self.conciseCities[i - 1] = cities[i]
-                }
-            } else {
-                self.conciseCities = cities
+            var cities = result as! [ConciseCity]
+            if conciseCities.count < cities.count, userCity != nil {
+                userCity = cities.removeFirst()
             }
-            
-            DispatchQueue.main.async {
+            conciseCities = cities
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.navigationItem.rightBarButtonItem?.isEnabled = self.dataSourceCount >= 20 ? false : true
                 self.weatherTableView.reloadData()
             }
         default:
@@ -273,13 +269,13 @@ extension WeatherListViewController: UITableViewDelegate {
             case .userWeather:
                 startIndex = 0
             case .savedWeather:
-                startIndex = self.userCity == nil ? indexPath.row : indexPath.row + 1
+                startIndex = userCity == nil ? indexPath.row : indexPath.row + 1
             }
         }
         let detailPageViewController = WeatherDetailPageViewController(startIndex: startIndex, cities: cities)
-        self.delegate = detailPageViewController
-        DispatchQueue.main.async {
-            self.navigationController?.pushViewController(detailPageViewController, animated: true)
+        delegate = detailPageViewController
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.pushViewController(detailPageViewController, animated: true)
         }
     }
 }
@@ -309,7 +305,8 @@ extension WeatherListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if (editingStyle == .delete) {
             conciseCities.remove(at: indexPath.row)
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
                 tableView.deleteRows(at: [indexPath], with: .automatic)
             }
@@ -339,7 +336,7 @@ extension WeatherListViewController: UITableViewDataSource {
                 cell.showUserGps()
                 return cell
             case .savedWeather:
-                cell.modifyCell(with: self.conciseCities[indexPath.row])
+                cell.modifyCell(with: conciseCities[indexPath.row])
                 return cell
             }
         }

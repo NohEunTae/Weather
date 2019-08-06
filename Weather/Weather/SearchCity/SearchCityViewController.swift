@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 class SearchCityViewController: UIViewController {
-    var isCancelButtonClicked = false
+    private var isCancelButtonClicked = false
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     
     weak var delegate: SearchResultViewControllerDelegate? = nil
@@ -30,9 +30,6 @@ class SearchCityViewController: UIViewController {
     
     func setupNavigationBar() {
         self.title = "도시 이름 입력"
-        
-        self.navigationItem.setHidesBackButton(true, animated: true)
-        
         let tableViewController = SearchResultViewController()
         tableViewController.delegate = self
         let searchController = UISearchController(searchResultsController: tableViewController)
@@ -48,11 +45,10 @@ class SearchCityViewController: UIViewController {
 }
 
 extension SearchCityViewController: UISearchControllerDelegate {
-    
     func didDismissSearchController(_ searchController: UISearchController) {
         if isCancelButtonClicked {
-            DispatchQueue.main.async { [unowned self] in
-                self.navigationController?.popViewController(animated: true)
+            DispatchQueue.main.async { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -65,8 +61,8 @@ extension SearchCityViewController: UISearchBarDelegate {
 
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         if isCancelButtonClicked {
-            DispatchQueue.main.async { [unowned self] in
-                self.navigationItem.searchController?.dismiss(animated: true)
+            DispatchQueue.main.async { [weak self] in
+                self?.navigationItem.searchController?.dismiss(animated: true)
             }
         }
     }
@@ -74,15 +70,15 @@ extension SearchCityViewController: UISearchBarDelegate {
 
 extension SearchCityViewController: SearchResultViewControllerDelegate {
     func searchDidFinished(item: MKMapItem) {
-        DispatchQueue.main.async { [unowned self] in
-            self.navigationController?.popViewController(animated: true)
-            self.delegate?.searchDidFinished(item: item)
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+            self?.delegate?.searchDidFinished(item: item)
         }
     }
     
     func tableViewBeginDragging() {
-        DispatchQueue.main.async {
-            self.navigationItem.searchController?.searchBar.resignFirstResponder()
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationItem.searchController?.searchBar.resignFirstResponder()
         }
     }
 }

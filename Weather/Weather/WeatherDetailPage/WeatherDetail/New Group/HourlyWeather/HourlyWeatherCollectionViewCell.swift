@@ -16,11 +16,12 @@ class HourlyWeatherCollectionViewCell: UICollectionViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.precipProbability.isHidden = true
+        precipProbability.isHidden = true
     }
     
     func modifyCell(with hourlyWeather: HourlyWeather, timezone: TimeZone) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             self.time.text = Date(timeIntervalSince1970: hourlyWeather.timeInterval).toString(timezone: timezone, dateFormat: "a h시")
             if let precipProbability = hourlyWeather.precipProbability {
                 self.precipProbability.isHidden = false
