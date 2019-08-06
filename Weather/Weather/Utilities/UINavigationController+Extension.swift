@@ -6,4 +6,10 @@
 //  Copyright © 2019 user. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+extension UINavigationController {
+    open override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+}

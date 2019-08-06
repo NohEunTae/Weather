@@ -27,10 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
         UINavigationBar.appearance().isTranslucent = true
         UINavigationBar.appearance().tintColor = .white
-        
+        UIApplication.shared.statusBarView?.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+
         UISearchBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-
         return true
     }
 
@@ -55,7 +55,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 
+extension UIApplication {
+    var statusBarView: UIView? {
+        if responds(to: Selector(("statusBar"))) {
+            return value(forKey: "statusBar") as? UIView
+        }
+        return nil
+    }
+}

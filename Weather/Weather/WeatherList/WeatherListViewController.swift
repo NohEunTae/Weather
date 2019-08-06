@@ -44,17 +44,17 @@ class WeatherListViewController: UIViewController {
         setupTableView()
         setupTableViewDataSource()
         setupLocationManager()
+        self.setNeedsStatusBarAppearanceUpdate()
+
         clock.delegate = self
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
         self.navigationController?.navigationBar.isTranslucent = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
     }
-    
+        
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        self.setNeedsStatusBarAppearanceUpdate()
         DispatchQueue.main.async {
             self.weatherTableView.reloadData()
         }
@@ -74,10 +74,6 @@ class WeatherListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
-
     func setupLocationManager() {
         self.locationManager.requestAlwaysAuthorization()
         locationManager.delegate = self

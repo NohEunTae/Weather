@@ -28,10 +28,6 @@ class SearchCityViewController: UIViewController {
         setupNavigationBar()
     }
     
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
-
     func setupNavigationBar() {
         self.title = "도시 이름 입력"
         
