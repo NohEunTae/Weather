@@ -22,15 +22,15 @@ struct JsonParser {
     
     var delegate: JsonParserDelegate? = nil
     
-    func startParsing(data: Data, parsingType: ParsingType, cityName: String? = nil, defaultCities: [DefaultCity]? = nil, conciseCity: ConciseCity? = nil) {
+    func startParsing(data: Data, parsingType: ParsingType, cityName: String? = nil, conciseCities: [ConciseCity]? = nil, conciseCity: ConciseCity? = nil) {
         let json = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
         switch parsingType {
         case .city, .userLocation:
             guard let validCityName = cityName else { return }
             parsingCity(json: json, cityName: validCityName, parsingType: parsingType)
         case .cities:
-            guard let validCities = defaultCities else { return }
-            parsingCities(json: json, defaultCities: validCities)
+            guard let validCities = conciseCities else { return }
+            parsingCities(json: json, conciseCities: validCities)
         case .detail:
             guard let validCity = conciseCity else { return }
             parsingDetailCity(json: json, conciseCity: validCity)
@@ -62,15 +62,15 @@ struct JsonParser {
         }
     }
     
-    private func parsingCities(json: [String: Any], defaultCities: [DefaultCity]) {
+    private func parsingCities(json: [String: Any], conciseCities: [ConciseCity]) {
         var cities: [ConciseCity] = []
         let list = json["list"] as? [[String: Any]]
         guard let validList = list else { return }
         
-        for i in 0..<defaultCities.count {
-            let cityName = defaultCities[i].name
-            let cityID = defaultCities[i].cityID
-            let timezone = defaultCities[i].timezone
+        for i in 0..<conciseCities.count {
+            let cityName = conciseCities[i].name
+            let cityID = conciseCities[i].cityID
+            let timezone = conciseCities[i].timezone
             
             let weather = validList[i]["weather"] as? [[String : Any]]
             guard let validWeather = weather else { return }

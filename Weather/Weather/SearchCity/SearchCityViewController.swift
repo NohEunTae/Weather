@@ -10,9 +10,7 @@ import UIKit
 import MapKit
 
 class SearchCityViewController: UIViewController {
-    private var isCancelButtonClicked = false
-    @IBOutlet weak var indicator: UIActivityIndicatorView!
-    
+    private var isCancelButtonClicked = false    
     weak var delegate: SearchResultViewControllerDelegate? = nil
     
     init() {

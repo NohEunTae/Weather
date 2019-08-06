@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ConciseCity: City {
+struct ConciseCity: City, Codable {
     let name: String
     let timezone: TimeZone
     let temp: Double

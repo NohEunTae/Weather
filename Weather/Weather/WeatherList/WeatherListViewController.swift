@@ -21,8 +21,7 @@ class WeatherListViewController: UIViewController {
     private var jsonParser = JsonParser()
     private var conciseCities: [ConciseCity] = [] {
         didSet {
-            let defaultCities = conciseCities.map { DefaultCity(city: $0)}
-            UserDefaults.standard.set(try? PropertyListEncoder().encode(defaultCities), forKey: "city")
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(conciseCities), forKey: "city")
         }
     }
     private let clock: Clock = Clock()
@@ -100,34 +99,32 @@ class WeatherListViewController: UIViewController {
     
     func setupTableViewDataSource() {
         if let data = UserDefaults.standard.value(forKey: "city") as? Data {
-            if var cities = try? PropertyListDecoder().decode(Array<DefaultCity>.self, from: data) {
+            if var cities = try? PropertyListDecoder().decode(Array<ConciseCity>.self, from: data) {
                 if CLLocationManager.locationServicesEnabled(), cities.count == 20 {
                     cities.removeLast()
                 }
-                fetchData(defaultCities: cities)
+                self.conciseCities = cities
+                fetchData(conciseCities: self.conciseCities)
             }
         }
     }
     
     func updateDataSource() {
         var cities: [ConciseCity] = conciseCities
-        
         if let userCity = userCity {
-            if conciseCities.count == 20 {
-                conciseCities.removeLast()
+            if cities.count == 20 {
+                cities.removeLast()
             }
-            cities = conciseCities
             cities.insert(userCity, at: 0)
         }
 
-        let defaultCities: [DefaultCity] = cities.map { DefaultCity(city: $0 as City) }
-        fetchData(defaultCities: defaultCities)
+        fetchData(conciseCities: cities)
     }
     
-    func fetchData(defaultCities: [DefaultCity]) {
-        guard !defaultCities.isEmpty else { return }
+    func fetchData(conciseCities: [ConciseCity]) {
+        guard !conciseCities.isEmpty else { return }
         var totalIds = ""
-        for city in defaultCities {
+        for city in conciseCities {
             totalIds += "\(city.cityID),"
         }
         totalIds.removeLast()
@@ -137,9 +134,11 @@ class WeatherListViewController: UIViewController {
             switch result {
             case .success(let data):
                 self.jsonParser.delegate = self
-                self.jsonParser.startParsing(data: data, parsingType: .cities, defaultCities: defaultCities)
+                self.jsonParser.startParsing(data: data, parsingType: .cities, conciseCities: conciseCities)
             case .failed(let error):
-                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
+                self.presentAlert(error.localizedDescription, message: "\(error.code)") { [weak self] in
+                    self?.weatherTableView.reloadData()
+                }
             }
         }
     }
