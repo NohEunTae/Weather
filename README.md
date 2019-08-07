@@ -41,6 +41,6 @@
 * ConciseCity와 DetailCity가 Codable Protocol 준수(UserDefault에 저장할 수 있도록)
 * ConciseCity는 배열형태로 UserDefault에 저장
 * DetailCity는 해당 ConciseCity의 name을 key로 하여 저장
-* Networking에 실패할 경우, 저장된 데이터를 
+* Networking에 실패할 경우, 저장된 데이터를 보여줌 
 
 
