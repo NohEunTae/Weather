@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct DailyWeather {
+struct DailyWeather: Codable {
     let timeInterval: TimeInterval
     let weatherIcon: String
     let tempMax: Double

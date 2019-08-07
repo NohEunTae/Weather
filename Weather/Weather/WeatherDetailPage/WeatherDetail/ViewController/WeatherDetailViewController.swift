@@ -28,6 +28,8 @@ class WeatherDetailViewController: UIViewController {
                 guard let self = self else { return }
                 self.titleView.update(subtitle: Date().toString(timezone: self.city.timezone, dateFormat: "a h:mm"))
             }
+            
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(detailCity), forKey: city.name)
         }
     }
 
@@ -107,7 +109,16 @@ class WeatherDetailViewController: UIViewController {
                 self.jsonParser.delegate = self
                 self.jsonParser.startParsing(data: data, parsingType: .detail, conciseCity: self.city)
             case .failed(let error):
-                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
+                if let data = UserDefaults.standard.value(forKey: self.city.name) as? Data {
+                    if let city = try? PropertyListDecoder().decode(DetailCity.self, from: data) {
+                        self.detailCity = city
+                        DispatchQueue.main.async { [weak self] in
+                            self?.weatherDetailTableView.reloadData()
+                        }
+                    }
+                } else {
+                    self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
+                }
             }
         }
     }

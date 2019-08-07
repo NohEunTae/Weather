@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct DetailCity: City {
+struct DetailCity: City, Codable {
     let cityID: Int
     let name: String
     let timezone: TimeZone

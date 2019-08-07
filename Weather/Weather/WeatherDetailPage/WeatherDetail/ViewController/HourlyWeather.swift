@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct HourlyWeather {
+struct HourlyWeather: Codable {
     let timeInterval: TimeInterval
     let precipProbability: Double?
     let weatherIcon: String

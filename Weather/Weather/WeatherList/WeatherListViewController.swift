@@ -136,8 +136,9 @@ class WeatherListViewController: UIViewController {
                 self.jsonParser.delegate = self
                 self.jsonParser.startParsing(data: data, parsingType: .cities, conciseCities: conciseCities)
             case .failed(let error):
-                self.presentAlert(error.localizedDescription, message: "\(error.code)") { [weak self] in
-                    self?.weatherTableView.reloadData()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.conciseCities.count > 0 ? self.weatherTableView.reloadData() : self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
                 }
             }
         }
@@ -154,7 +155,9 @@ extension WeatherListViewController: SearchResultViewControllerDelegate {
                 self.jsonParser.delegate = self
                 self.jsonParser.startParsing(data: data, parsingType: .city, cityName: item.placemark.name!)
             case .failed(let error):
-                self.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
+                DispatchQueue.main.async { [weak self] in
+                    self?.presentAlert(error.localizedDescription, message: "\(error.code)", completion: nil)
+                }
             }
         }
     }
