@@ -24,12 +24,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: .default)
-        UINavigationBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UINavigationBar.appearance().backgroundColor = UIColor(red: 31/255, green: 33/255, blue: 36/255, alpha: 1)
         UINavigationBar.appearance().isTranslucent = true
         UINavigationBar.appearance().tintColor = .white
-        UIApplication.shared.statusBarView?.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UIApplication.shared.statusBarView?.backgroundColor = UIColor(red: 31/255, green: 33/255, blue: 36/255, alpha: 1)
 
-        UISearchBar.appearance().backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        UISearchBar.appearance().backgroundColor = UIColor(red: 31/255, green: 33/255, blue: 36/255, alpha: 1)
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         return true
     }

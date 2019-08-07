@@ -78,7 +78,7 @@ class WeatherDetailViewController: UIViewController {
     
     func setupNavigationBarItems() {
         let bar:UINavigationBar! =  navigationController?.navigationBar
-        bar.backgroundColor = UIColor(red: 32/255, green: 32/255, blue: 36/255, alpha: 1)
+        bar.backgroundColor = UIColor(red: 31/255, green: 33/255, blue: 36/255, alpha: 1)
         navigationItem.titleView = titleView
         titleView.set(city.name, subtitle: Date().toString(timezone: city.timezone, dateFormat: "a h:mm"))
         let listButton = UIBarButtonItem(image: UIImage(named: "list"), style: .plain, target: self, action: #selector(listButtonClicked))

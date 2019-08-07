@@ -62,7 +62,7 @@
                                         </constraints>
                                     </imageView>
                                 </subviews>
-                                <color key="backgroundColor" red="0.12549019607843137" green="0.12549019607843137" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.12156862745098039" green="0.12941176470588234" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="10" id="HW8-rf-N5p"/>
                                     <constraint firstItem="wrj-Rr-NJg" firstAttribute="centerY" secondItem="BNG-sp-pKZ" secondAttribute="centerY" id="be2-4f-uJa"/>
@@ -97,7 +97,7 @@
                     <constraint firstItem="iY2-L8-ZDe" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="xc2-uH-6M8"/>
                 </constraints>
             </tableViewCellContentView>
-            <color key="backgroundColor" red="0.12549019607843137" green="0.12549019607843137" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" red="0.12156862745098039" green="0.12941176470588234" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="cityName" destination="zLa-uO-OOL" id="62w-9F-dZ1"/>

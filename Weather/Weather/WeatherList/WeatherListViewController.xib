@@ -23,10 +23,10 @@
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="90" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="MU4-ew-i23">
                     <rect key="frame" x="0.0" y="20" width="375" height="647"/>
-                    <color key="backgroundColor" red="0.12549019607843137" green="0.12549019607843137" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="backgroundColor" red="0.12156862745098039" green="0.12941176470588234" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </tableView>
             </subviews>
-            <color key="backgroundColor" red="0.12549019607843137" green="0.12549019607843137" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" red="0.12156862745098039" green="0.12941176470588234" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="MU4-ew-i23" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="5pI-vz-tvY"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="MU4-ew-i23" secondAttribute="trailing" id="DUs-uT-p5A"/>
